@@ -1,7 +1,8 @@
 # GitHide
 
-A tiny Chromium extension that adds **Hide generated files** to the toolbar in
-GitHub's pull request **Files changed** tab (`/changes` and `/files`).
+A small Chromium extension to simplify GitHub PR reviews. Hide generated diffs
+in **Files changed**, and hide unused sidebar sections and metadata events on
+the PR conversation page.
 
 ## Install in Brave, Chrome, or Edge
 
@@ -15,6 +16,22 @@ GitHub's pull request **Files changed** tab (`/changes` and `/files`).
 No build or npm install is needed to use the extension.
 
 Chrome Web Store publication is paused. Use the unpacked installation above.
+
+## PR conversation view
+
+Open **PR view** beside the PR header actions. Choose which parts to hide:
+
+- Labels
+- Projects
+- Milestone
+- Development
+- Activity events (title changes, assignments, labels, projects, milestones,
+  and force-push events)
+
+All options start off, save locally across PRs, and update other open tabs.
+Uncheck an option to restore its content. The dropdown also closes with Escape
+or a click outside it. Comments, reviews, commit lists, checks, merge controls,
+and PR state changes stay visible. Unrecognized event types stay visible too.
 
 ## Behavior and privacy
 
@@ -31,7 +48,7 @@ Chrome Web Store publication is paused. Use the unpacked installation above.
 - Leaves GitHub's review/file counts unchanged.
 - Runs only on `github.com`. The host-wide match lets it handle navigation into
   a PR without reloading. It makes no network requests and uses no background
-  service. The `storage` permission saves only your checkbox preference locally.
+  service. The `storage` permission saves only your display preferences locally.
 - GitHub Enterprise hosts and non-English generated notices are not supported.
   GitHub markup changes may require selector updates. A generated diff already
   loaded before this script starts may have no remaining generated notice.
@@ -53,7 +70,7 @@ Create the upload ZIP from the repository root:
 
 ```sh
 mkdir -p dist
-zip -X dist/githide-1.0.0.zip manifest.json content.js content.css icons/*.png LICENSE
+zip -X dist/githide-1.0.0.zip manifest.json content.js pr-view.js content.css icons/*.png LICENSE
 ```
 
 Only extension runtime files, icons, and the license go in the upload ZIP.

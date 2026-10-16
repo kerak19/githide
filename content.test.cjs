@@ -4,6 +4,7 @@ const {readFileSync} = require('node:fs');
 const {JSDOM} = require('jsdom');
 
 const script = readFileSync(`${__dirname}/content.js`, 'utf8');
+const prViewScript = readFileSync(`${__dirname}/pr-view.js`, 'utf8');
 const notice = '<span class="fgColor-muted">Some generated files are not rendered by default. Learn more about <a href="https://docs.github.com/github/administering-a-repository/customizing-how-changed-files-appear-on-github">customizing how changed files appear on GitHub.</a></span>';
 const file = (id, body = '<table><tr><td>source code</td></tr></table>') =>
   `<div role="region" id="diff-${id}"><h3>${id}</h3>${body}</div>`;
@@ -13,7 +14,9 @@ function createStorage(data = {}) {
   const listeners = [];
   return {
     local: {
-      async get(key) { return {[key]: data[key]}; },
+      async get(keys) {
+        return Object.fromEntries((Array.isArray(keys) ? keys : [keys]).map(key => [key, data[key]]));
+      },
       async set(values) {
         const changes = {};
         for (const [key, newValue] of Object.entries(values)) {
@@ -40,6 +43,7 @@ async function page(path = '/owner/repo/pull/1/changes', body = '', storage = cr
   dom.window.close = () => { observers.forEach(observer => observer.disconnect()); close(); };
   dom.window.chrome = {storage};
   await dom.window.eval(script);
+  await dom.window.eval(prViewScript);
   return dom;
 }
 
@@ -199,4 +203,92 @@ test('manifest is MV3, GitHub-only, and references existing runtime files', () =
     assert.equal(png.readUInt32BE(16), Number(size));
     assert.equal(png.readUInt32BE(20), Number(size));
   }
+});
+
+const conversationFixture = `<div data-component="PH_Actions"><button>Edit</button></div>
+  <aside id="partial-discussion-sidebar">
+    <div class="discussion-sidebar-item" data-channel-event-name="labels_updated">Labels</div>
+    <div class="discussion-sidebar-item" data-channel-event-name="projects_updated">Projects</div>
+    <div class="discussion-sidebar-item" data-channel-event-name="milestone_updated">Milestone</div>
+    <create-branch class="discussion-sidebar-item">Development</create-branch>
+    <div class="discussion-sidebar-item" id="reviewers">Reviewers</div>
+  </aside>
+  <div class="TimelineItem" id="event-title"><span class="TimelineItem-badge"><svg class="octicon-pencil"></svg></span>Renamed</div>
+  <div class="TimelineItem" id="event-push"><span class="TimelineItem-badge"><svg class="octicon-repo-push"></svg></span>Force pushed</div>
+  <div class="TimelineItem" id="event-review"><span class="TimelineItem-badge"><svg class="octicon-code-review"></svg></span>Approved</div>
+  <div class="TimelineItem" id="event-closed"><span class="TimelineItem-badge"><svg class="octicon-issue-closed"></svg></span>Closed</div>
+  <div class="TimelineItem" id="event-unknown">Unknown event</div>
+  <div class="TimelineItem" id="event-comment"><span class="TimelineItem-badge"><svg class="octicon-pencil"></svg></span><div class="timeline-comment">Comment</div></div>
+  <div class="TimelineItem" id="commit">Commit</div>
+  <div id="checks">Checks</div><button id="merge">Merge</button>`;
+
+test('PR dropdown independently hides sidebar sections and known activity, preserving review content', async () => {
+  const data = {};
+  const dom = await page('/owner/repo/pull/1', conversationFixture, createStorage(data));
+  const {document} = dom.window;
+  try {
+    const menu = document.querySelector('#githide-pr-view');
+    assert.ok(menu);
+    assert.equal(menu.parentElement.getAttribute('data-component'), 'PH_Actions');
+    assert.equal(menu.querySelectorAll('input').length, 5);
+    assert.equal(document.querySelectorAll('.githide-pr-hidden').length, 0);
+    menu.querySelector('[name="hideLabels"]').click();
+    assert.ok(document.querySelector('[data-channel-event-name="labels_updated"].githide-pr-hidden'));
+    assert.equal(document.querySelectorAll('.githide-pr-hidden').length, 1);
+    for (const key of ['hideProjects', 'hideMilestone', 'hideDevelopment', 'hideActivity']) {
+      menu.querySelector(`[name="${key}"]`).click();
+    }
+    assert.equal(document.querySelectorAll('.githide-pr-hidden').length, 6);
+    assert.deepEqual(Object.values(data), [true, true, true, true, true]);
+    for (const id of ['reviewers', 'event-review', 'event-closed', 'event-unknown', 'event-comment', 'commit', 'checks', 'merge']) {
+      assert.equal(document.getElementById(id).classList.contains('githide-pr-hidden'), false, id);
+    }
+    for (const input of menu.querySelectorAll('input')) input.click();
+    assert.equal(document.querySelectorAll('.githide-pr-hidden').length, 0);
+  } finally { dom.window.close(); }
+});
+
+test('PR view settings persist, synchronize, handle late sections, and clear on navigation', async () => {
+  const storage = createStorage({hideLabels: true, hideActivity: true});
+  const first = await page('/owner/repo/pull/1', conversationFixture, storage);
+  const second = await page('/owner/repo/pull/2', conversationFixture, storage);
+  const {window} = first;
+  const {document, Event} = window;
+  try {
+    assert.equal(document.querySelector('[name="hideLabels"]').checked, true);
+    assert.ok(document.querySelector('#event-push.githide-pr-hidden'));
+    second.window.document.querySelector('[name="hideLabels"]').click();
+    assert.equal(document.querySelector('[name="hideLabels"]').checked, false);
+    assert.equal(document.querySelector('[data-channel-event-name="labels_updated"]').classList.contains('githide-pr-hidden'), false);
+    document.body.insertAdjacentHTML('beforeend', '<div class="TimelineItem" id="event-late"><span class="TimelineItem-badge"><svg class="octicon-person"></svg></span>Assigned</div>');
+    await settle(window);
+    assert.ok(document.querySelector('#event-late.githide-pr-hidden'));
+    document.querySelector('#githide-pr-view').remove();
+    await settle(window);
+    assert.equal(document.querySelectorAll('#githide-pr-view').length, 1);
+    assert.equal(document.querySelector('[name="hideActivity"]').checked, true);
+    window.history.pushState({}, '', '/owner/repo/pull/1/changes');
+    document.dispatchEvent(new Event('turbo:load'));
+    assert.equal(document.querySelector('#githide-pr-view'), null);
+    assert.equal(document.querySelectorAll('.githide-pr-hidden').length, 0);
+    window.history.pushState({}, '', '/owner/repo/issues/1');
+    document.dispatchEvent(new Event('turbo:load'));
+    assert.equal(document.querySelector('#githide-pr-view'), null);
+  } finally { first.window.close(); second.window.close(); }
+});
+
+test('PR dropdown closes with Escape or an outside click', async () => {
+  const dom = await page('/owner/repo/pull/1', conversationFixture);
+  const {document, KeyboardEvent} = dom.window;
+  try {
+    const menu = document.querySelector('#githide-pr-view');
+    menu.open = true;
+    menu.querySelector('input').focus();
+    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'}));
+    assert.equal(menu.open, false);
+    assert.equal(document.activeElement, menu.querySelector('summary'));
+    menu.open = true;
+    document.querySelector('#checks').click();
+    assert.equal(menu.open, false);
+  } finally { dom.window.close(); }
 });

@@ -6,7 +6,7 @@ Status: publication paused; not submitted or approved.
 
 Name: GitHide
 
-Summary: A small checkbox to hide generated file diffs in GitHub pull requests.
+Summary: Hide generated diffs, unused sidebar sections, and activity events in GitHub pull requests.
 
 Language: English
 
@@ -28,6 +28,11 @@ browser. The checkbox starts unchecked on first use and remembers your preferenc
 locally across reloads and PRs. A hidden-file count shows generated files detected
 so far; it can grow as GitHub loads more diffs.
 
+On the PR conversation page, open PR view beside the header actions to hide
+Labels, Projects, Milestone, Development, or metadata activity events. These
+choices save locally across PRs. Comments, reviews, commit lists, checks, merge
+controls, PR state changes, and unrecognized events stay visible.
+
 Supports github.com pull request /changes and /files pages. GitHub Enterprise
 hosts and non-English generated-file notices are not supported. If a generated
 diff was already loaded before GitHide starts, its generated-file notice may no
@@ -44,17 +49,17 @@ Privacy policy: https://github.com/kerak19/githide/blob/main/PRIVACY.md
 
 ## Privacy practices
 
-Single purpose: Hide generated file diff cards in GitHub pull request reviews
-with one reversible checkbox.
+Single purpose: Simplify GitHub pull request reviews with reversible display
+filters for generated diffs, unused sidebar sections, and metadata activity events.
 
 Site access justification: GitHide needs to read GitHub's rendered diff markup
 to detect generated-file notices and add its checkbox. It matches github.com
 pages so it continues to work when GitHub navigates into Files changed without
-a full reload. It modifies the page only on pull request /changes and /files
-views. Page processing stays in the current tab and no data is transmitted.
+a full reload. It modifies the page only on pull request conversation, /changes,
+and /files views. Page processing stays in the current tab and no data is transmitted.
 
-Storage justification: Stores only the hideGenerated boolean preference locally
-so your checkbox choice persists across reloads and PRs. It does not store page
+Storage justification: Stores only boolean display preferences locally
+so your choices persist across reloads and PRs. It does not store page
 content or sync data to a server.
 
 Remote code: No. All executable code is included in the extension ZIP.
