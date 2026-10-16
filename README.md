@@ -14,6 +14,9 @@ GitHub's pull request **Files changed** tab (`/changes` and `/files`).
 
 No build or npm install is needed to use the extension.
 
+Chrome Web Store publication is being prepared. Until a store listing is live,
+use the unpacked installation above.
+
 ## Behavior and privacy
 
 - Starts unchecked. The choice lasts until the page is reloaded.
@@ -40,3 +43,20 @@ npm test
 ```
 
 The runtime is plain JavaScript and CSS. jsdom is used only for tests.
+
+## Store package
+
+Create the upload ZIP from the repository root:
+
+```sh
+mkdir -p dist
+zip -X dist/githide-1.0.0.zip manifest.json content.js content.css icons/*.png LICENSE
+```
+
+Only extension runtime files, icons, and the license go in the upload ZIP.
+Store listing text and submission notes are in [store/LISTING.md](store/LISTING.md).
+
+## License and privacy
+
+GitHide is open source under the [MIT license](LICENSE).
+See the [privacy policy](PRIVACY.md) for details of local page processing.

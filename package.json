@@ -2,6 +2,7 @@
   "name": "githide",
   "version": "1.0.0",
   "private": true,
+  "license": "MIT",
   "scripts": {"test": "node --test"},
   "devDependencies": {"jsdom": "^27.0.1"}
 }

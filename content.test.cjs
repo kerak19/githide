@@ -86,4 +86,10 @@ test('manifest is MV3, GitHub-only, and references existing runtime files', () =
   for (const name of [...manifest.content_scripts[0].js, ...manifest.content_scripts[0].css]) {
     assert.ok(readFileSync(`${__dirname}/${name}`).length);
   }
+  for (const [size, name] of Object.entries(manifest.icons)) {
+    const png = readFileSync(`${__dirname}/${name}`);
+    assert.equal(png.subarray(1, 4).toString(), 'PNG');
+    assert.equal(png.readUInt32BE(16), Number(size));
+    assert.equal(png.readUInt32BE(20), Number(size));
+  }
 });
