@@ -25,6 +25,7 @@ Open **PR view** beside the PR header actions. Choose which parts to hide:
 - Projects
 - Milestone
 - Development
+- Notifications
 - Activity events (title changes, assignments, labels, projects, milestones,
   and force-push events)
 

@@ -205,12 +205,13 @@ test('manifest is MV3, GitHub-only, and references existing runtime files', () =
   }
 });
 
-const conversationFixture = `<div data-component="PH_Actions"><button>Edit</button></div>
+const conversationFixture = `<div data-component="PH_Actions"><button>Edit</button><button id="code-menu" class="prc-Button-native" data-component="Button" data-size="medium" data-variant="default" aria-expanded="false"><span data-component="buttonContent"><span data-component="leadingVisual">Code icon</span><span data-component="text">Code</span><span data-component="trailingVisual">Chevron</span></span></button></div>
   <aside id="partial-discussion-sidebar">
     <div class="discussion-sidebar-item" data-channel-event-name="labels_updated">Labels</div>
     <div class="discussion-sidebar-item" data-channel-event-name="projects_updated">Projects</div>
     <div class="discussion-sidebar-item" data-channel-event-name="milestone_updated">Milestone</div>
-    <create-branch class="discussion-sidebar-item">Development</create-branch>
+    <create-branch class="discussion-sidebar-item d-block"><div data-channel-event-name="issue_references_updated">Development</div></create-branch>
+    <div class="discussion-sidebar-item sidebar-notifications">Notifications</div>
     <div class="discussion-sidebar-item" id="reviewers">Reviewers</div>
   </aside>
   <div class="TimelineItem" id="event-title"><span class="TimelineItem-badge"><svg class="octicon-pencil"></svg></span>Renamed</div>
@@ -230,16 +231,23 @@ test('PR dropdown independently hides sidebar sections and known activity, prese
     const menu = document.querySelector('#githide-pr-view');
     assert.ok(menu);
     assert.equal(menu.parentElement.getAttribute('data-component'), 'PH_Actions');
-    assert.equal(menu.querySelectorAll('input').length, 5);
+    assert.equal(menu.querySelectorAll('input').length, 6);
+    assert.equal(menu.querySelector('summary').className, document.querySelector('#code-menu').className);
+    assert.equal(menu.querySelector('summary').getAttribute('data-size'), 'medium');
+    assert.equal(menu.querySelector('summary [data-component="text"]').textContent, 'PR view');
+    assert.equal(menu.querySelector('summary [data-component="leadingVisual"]'), null);
+    assert.equal(menu.querySelector('summary [data-component="trailingVisual"]').textContent, 'Chevron');
+    assert.equal(menu.querySelector('summary').id, '');
+    assert.equal(document.querySelector('#code-menu [data-component="text"]').textContent, 'Code');
     assert.equal(document.querySelectorAll('.githide-pr-hidden').length, 0);
     menu.querySelector('[name="hideLabels"]').click();
     assert.ok(document.querySelector('[data-channel-event-name="labels_updated"].githide-pr-hidden'));
     assert.equal(document.querySelectorAll('.githide-pr-hidden').length, 1);
-    for (const key of ['hideProjects', 'hideMilestone', 'hideDevelopment', 'hideActivity']) {
+    for (const key of ['hideProjects', 'hideMilestone', 'hideDevelopment', 'hideNotifications', 'hideActivity']) {
       menu.querySelector(`[name="${key}"]`).click();
     }
-    assert.equal(document.querySelectorAll('.githide-pr-hidden').length, 6);
-    assert.deepEqual(Object.values(data), [true, true, true, true, true]);
+    assert.equal(document.querySelectorAll('.githide-pr-hidden').length, 7);
+    assert.deepEqual(Object.values(data), [true, true, true, true, true, true]);
     for (const id of ['reviewers', 'event-review', 'event-closed', 'event-unknown', 'event-comment', 'commit', 'checks', 'merge']) {
       assert.equal(document.getElementById(id).classList.contains('githide-pr-hidden'), false, id);
     }

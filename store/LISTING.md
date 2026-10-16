@@ -29,7 +29,7 @@ locally across reloads and PRs. A hidden-file count shows generated files detect
 so far; it can grow as GitHub loads more diffs.
 
 On the PR conversation page, open PR view beside the header actions to hide
-Labels, Projects, Milestone, Development, or metadata activity events. These
+Labels, Projects, Milestone, Development, Notifications, or metadata activity events. These
 choices save locally across PRs. Comments, reviews, commit lists, checks, merge
 controls, PR state changes, and unrecognized events stay visible.
 

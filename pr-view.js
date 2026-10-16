@@ -3,7 +3,8 @@
     ['hideLabels', 'Labels', '[data-channel-event-name="labels_updated"]'],
     ['hideProjects', 'Projects', '[data-channel-event-name="projects_updated"]'],
     ['hideMilestone', 'Milestone', '[data-channel-event-name="milestone_updated"]'],
-    ['hideDevelopment', 'Development', 'create-branch.discussion-sidebar-item'],
+    ['hideDevelopment', 'Development', 'create-branch.discussion-sidebar-item, [data-channel-event-name="issue_references_updated"]'],
+    ['hideNotifications', 'Notifications', '.sidebar-notifications'],
     ['hideActivity', 'Activity events', '.TimelineItem[id^="event-"]'],
   ];
   const activityIcons = ['person', 'pencil', 'repo-push', 'tag', 'project', 'milestone']
@@ -43,10 +44,23 @@
       menu = document.createElement('details');
       menu.id = 'githide-pr-view';
       const summary = document.createElement('summary');
+      const codeButton = [...host.querySelectorAll('button')]
+        .find(button => (button.querySelector('[data-component="text"]') || button).textContent.trim() === 'Code');
+      const codeContent = codeButton?.querySelector('[data-component="buttonContent"]');
+      summary.className = 'btn';
       summary.textContent = 'PR view';
+      if (codeContent?.querySelector('[data-component="text"]')) {
+        for (const attribute of ['class', 'data-component', 'data-loading', 'data-size', 'data-variant']) {
+          if (codeButton.hasAttribute(attribute)) summary.setAttribute(attribute, codeButton.getAttribute(attribute));
+        }
+        const content = codeContent.cloneNode(true);
+        content.querySelector('[data-component="leadingVisual"]')?.remove();
+        content.querySelector('[data-component="text"]').textContent = 'PR view';
+        summary.replaceChildren(content);
+      }
       summary.title = 'Choose which PR sections to hide. Choices are saved across PRs.';
       const panel = document.createElement('div');
-      panel.className = 'githide-pr-panel';
+      panel.className = 'githide-pr-panel Box color-shadow-large';
       for (const [key, name] of options) {
         const label = document.createElement('label');
         const checkbox = document.createElement('input');

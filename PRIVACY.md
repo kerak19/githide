@@ -13,7 +13,8 @@ and file tree entries. It also reads rendered PR sidebar and timeline markup
 to hide selected sections and known metadata events.
 File identifiers stay in the tab's memory until the page is reloaded or closed.
 GitHide stores only your display preferences (`hideGenerated`, `hideLabels`,
-`hideProjects`, `hideMilestone`, `hideDevelopment`, and `hideActivity`, each true or false)
+`hideProjects`, `hideMilestone`, `hideDevelopment`, `hideNotifications`, and
+`hideActivity`, each true or false)
 in the extension's local browser storage so it persists across reloads and PRs.
 These preferences are shared with your other open GitHub tabs, but are not synced
 to other devices or sent to a server. It is cleared when you remove the extension.

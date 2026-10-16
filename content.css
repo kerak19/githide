@@ -1,22 +1,21 @@
-.githide-hidden,
-.githide-pr-hidden {
+body .githide-hidden,
+body .githide-pr-hidden {
   display: none !important;
 }
 
 #githide-pr-view {
   position: relative;
   flex-shrink: 0;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--fgColor-default, #1f2328);
 }
 
 #githide-pr-view summary {
-  padding: 5px 10px;
-  border: 1px solid var(--borderColor-default, #d1d9e0);
-  border-radius: 6px;
-  background: var(--bgColor-muted, #f6f8fa);
-  cursor: pointer;
-  white-space: nowrap;
+  list-style: none;
+}
+
+#githide-pr-view summary::-webkit-details-marker {
+  display: none;
 }
 
 .githide-pr-panel {
@@ -24,13 +23,9 @@
   z-index: 100;
   top: calc(100% + 6px);
   right: 0;
-  width: 210px;
+  width: 230px;
   max-width: calc(100vw - 32px);
   padding: 8px;
-  border: 1px solid var(--borderColor-default, #d1d9e0);
-  border-radius: 8px;
-  background: var(--bgColor-default, #fff);
-  box-shadow: 0 8px 24px #0003;
 }
 
 .githide-pr-panel label {
