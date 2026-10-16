@@ -1,0 +1,22 @@
+.githide-hidden {
+  display: none !important;
+}
+
+#githide-control {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 6px;
+  margin: 4px 8px;
+  color: var(--fgColor-muted, #59636e);
+  font-size: 12px;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+#githide-control input {
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  accent-color: var(--fgColor-accent, #0969da);
+}

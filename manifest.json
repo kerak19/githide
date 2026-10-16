@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "GitHide",
+  "version": "1.0.0",
+  "description": "A small checkbox to hide generated file diffs in GitHub pull requests.",
+  "content_scripts": [{
+    "matches": ["https://github.com/*"],
+    "js": ["content.js"],
+    "css": ["content.css"]
+  }]
+}

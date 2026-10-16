@@ -1,0 +1,42 @@
+# GitHide
+
+A tiny Chromium extension that adds **Hide generated files** to the toolbar in
+GitHub's pull request **Files changed** tab (`/changes` and `/files`).
+
+## Install in Brave, Chrome, or Edge
+
+1. Clone this repository or download its ZIP and extract it.
+2. Open `brave://extensions` (or `chrome://extensions` / `edge://extensions`).
+3. Enable **Developer mode**.
+4. Choose **Load unpacked** and select the folder containing `manifest.json`.
+5. Refresh an existing GitHub tab, open a pull request's **Files changed** tab,
+   and check **Hide generated files**.
+
+No build or npm install is needed to use the extension.
+
+## Behavior and privacy
+
+- Starts unchecked. The choice lasts until the page is reloaded.
+- Hides entire generated diff cards, including their headers, without marking
+  them as viewed. Unchecking restores them.
+- Uses GitHub's generated-file notice; does not guess from filenames.
+- Handles dynamically loaded diffs and navigation within GitHub. Once a file is
+  recognized, it stays recognized in that view even after **Load Diff** is clicked.
+- Leaves the file tree and GitHub's review/file counts unchanged.
+- Runs only on `github.com`. The host-wide match lets it handle navigation into
+  a PR without reloading. It makes no network requests, stores no data, and uses
+  no background service or extra extension permissions.
+- GitHub Enterprise hosts and non-English generated notices are not supported.
+  GitHub markup changes may require selector updates. A generated diff already
+  loaded before this script starts may have no remaining generated notice.
+
+## Development
+
+Use Node.js 20.19+, 22.12+, or 24+:
+
+```sh
+npm ci
+npm test
+```
+
+The runtime is plain JavaScript and CSS. jsdom is used only for tests.
