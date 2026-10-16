@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "description": "A small checkbox to hide generated file diffs in GitHub pull requests.",
   "homepage_url": "https://github.com/kerak19/githide",
+  "permissions": ["storage"],
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",

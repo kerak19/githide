@@ -18,7 +18,10 @@ Chrome Web Store publication is paused. Use the unpacked installation above.
 
 ## Behavior and privacy
 
-- Starts unchecked. The choice lasts until the page is reloaded.
+- Starts unchecked on first use. Remembers your choice locally across reloads
+  and PRs, and updates other open GitHub tabs when you toggle it.
+- Shows the number of detected generated files hidden while checked. The count
+  can grow as GitHub loads more diffs; it is not a total for the whole PR.
 - Hides entire generated diff cards, including their headers, without marking
   them as viewed. Also hides their entries in the left file tree and folders
   whose loaded entries are all hidden. Unchecking restores them.
@@ -27,8 +30,8 @@ Chrome Web Store publication is paused. Use the unpacked installation above.
   recognized, it stays recognized in that view even after **Load Diff** is clicked.
 - Leaves GitHub's review/file counts unchanged.
 - Runs only on `github.com`. The host-wide match lets it handle navigation into
-  a PR without reloading. It makes no network requests, stores no data, and uses
-  no background service or extra extension permissions.
+  a PR without reloading. It makes no network requests and uses no background
+  service. The `storage` permission saves only your checkbox preference locally.
 - GitHub Enterprise hosts and non-English generated notices are not supported.
   GitHub markup changes may require selector updates. A generated diff already
   loaded before this script starts may have no remaining generated notice.

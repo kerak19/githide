@@ -1,9 +1,15 @@
-(() => {
+(async () => {
   const fileSelector = '[role="region"][id^="diff-"], .file[id][data-file-type]';
   const generated = new Set();
   let currentView = '';
   let hide = false;
   let scheduled = false;
+
+  try {
+    hide = (await chrome.storage.local.get('hideGenerated')).hideGenerated === true;
+  } catch (error) {
+    console.warn('GitHide could not load the saved setting.', error);
+  }
 
   function update() {
     scheduled = false;
@@ -50,19 +56,25 @@
       if (!toolbar) return;
       control = document.createElement('label');
       control.id = 'githide-control';
-      control.title = 'Hide generated diffs and their file tree entries. Uncheck to show them again.';
+      control.title = 'Hide generated diffs and their file tree entries. Uncheck to show them again. The count includes only files detected so far.';
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.checked = hide;
       checkbox.addEventListener('change', () => {
         hide = checkbox.checked;
         update();
+        chrome.storage.local.set({hideGenerated: hide}).catch(error =>
+          console.warn('GitHide could not save the setting.', error));
       });
       const text = document.createElement('span');
       text.textContent = 'Hide generated files';
       control.append(checkbox, text);
       toolbar.append(control);
     }
+    control.querySelector('input').checked = hide;
+    const text = control.querySelector('span');
+    const label = hide ? `Hide generated files · ${generated.size} hidden` : 'Hide generated files';
+    if (text.textContent !== label) text.textContent = label;
   }
 
   const observer = new MutationObserver(() => {
@@ -74,5 +86,11 @@
   observer.observe(document.documentElement, {childList: true, subtree: true, characterData: true});
   document.addEventListener('turbo:load', update);
   window.addEventListener('popstate', update);
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local' && changes.hideGenerated) {
+      hide = changes.hideGenerated.newValue === true;
+      update();
+    }
+  });
   update();
 })();

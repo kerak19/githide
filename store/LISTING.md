@@ -24,7 +24,9 @@ GitHub. It also hides generated entries in the left file tree and folders whose
 loaded entries are all hidden. It leaves file counts and Viewed state unchanged.
 
 No account, configuration, analytics, or background service. No data leaves your
-browser. The checkbox starts unchecked and resets on a full page reload.
+browser. The checkbox starts unchecked on first use and remembers your preference
+locally across reloads and PRs. A hidden-file count shows generated files detected
+so far; it can grow as GitHub loads more diffs.
 
 Supports github.com pull request /changes and /files pages. GitHub Enterprise
 hosts and non-English generated-file notices are not supported. If a generated
@@ -49,8 +51,11 @@ Site access justification: GitHide needs to read GitHub's rendered diff markup
 to detect generated-file notices and add its checkbox. It matches github.com
 pages so it continues to work when GitHub navigates into Files changed without
 a full reload. It modifies the page only on pull request /changes and /files
-views. Processing stays in the current tab and no data is transmitted or stored
-persistently.
+views. Page processing stays in the current tab and no data is transmitted.
+
+Storage justification: Stores only the hideGenerated boolean preference locally
+so your checkbox choice persists across reloads and PRs. It does not store page
+content or sync data to a server.
 
 Remote code: No. All executable code is included in the extension ZIP.
 
