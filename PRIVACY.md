@@ -7,7 +7,8 @@ GitHide adds a checkbox to hide generated file diffs in GitHub pull requests.
 ## Data handling
 
 GitHide reads the current GitHub page's URL and rendered diff markup locally
-to find GitHub's generated-file notices and show or hide the matching cards.
+to find GitHub's generated-file notices and show or hide the matching cards
+and file tree entries.
 File identifiers and your checkbox choice stay in the tab's memory until the
 page is reloaded or closed. GitHide does not persist them.
 
@@ -19,7 +20,7 @@ no network requests and includes no analytics, advertising, or remote code.
 
 The extension runs on `https://github.com/*` so that it can follow GitHub's
 navigation into a pull request without requiring a full page reload. It only
-adds its control and hides diff cards on pull request Files changed pages.
+adds its control and hides diff cards and file tree entries on pull request Files changed pages.
 It does not change repository files, submit reviews, or mark files as viewed.
 
 ## Contact

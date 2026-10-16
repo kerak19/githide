@@ -1,6 +1,6 @@
 # Chrome Web Store submission
 
-Status: prepared for submission; not submitted or approved.
+Status: publication paused; not submitted or approved.
 
 ## Listing
 
@@ -20,7 +20,8 @@ headers. Uncheck it to bring them back.
 
 GitHide follows GitHub's generated-file notices instead of maintaining a list of
 filename patterns. It handles diffs loaded while scrolling and navigation within
-GitHub. It leaves the file tree, file counts, and Viewed state unchanged.
+GitHub. It also hides generated entries in the left file tree and folders whose
+loaded entries are all hidden. It leaves file counts and Viewed state unchanged.
 
 No account, configuration, analytics, or background service. No data leaves your
 browser. The checkbox starts unchecked and resets on a full page reload.

@@ -32,14 +32,25 @@
       file.classList.toggle('githide-hidden', hide && generated.has(file.id));
     }
 
+    const treeItems = [...document.querySelectorAll('#pr-file-tree [role="treeitem"]')];
+    for (const item of treeItems.reverse()) {
+      const children = [...item.querySelectorAll('[role="treeitem"]')];
+      const link = item.querySelector('a[href^="#diff-"]');
+      const hidden = children.length
+        ? children.every(child => child.classList.contains('githide-hidden'))
+        : !item.hasAttribute('aria-expanded') && link && generated.has(link.hash.slice(1));
+      item.classList.toggle('githide-hidden', hide && Boolean(hidden));
+    }
+
     let control = document.getElementById('githide-control');
     if (!control) {
-      const toolbar = document.getElementById('changes-selector-button')?.closest('section') ||
-        document.querySelector('.pr-review-tools');
+      const selector = document.getElementById('changes-selector-button');
+      const toolbar = selector?.closest('[data-component="Stack"]') ||
+        selector?.closest('section') || document.querySelector('.pr-review-tools');
       if (!toolbar) return;
       control = document.createElement('label');
       control.id = 'githide-control';
-      control.title = 'Hide diff cards GitHub identifies as generated. Uncheck to show them again.';
+      control.title = 'Hide generated diffs and their file tree entries. Uncheck to show them again.';
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.checked = hide;

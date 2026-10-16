@@ -10,7 +10,7 @@ const file = (id, body = '<table><tr><td>source code</td></tr></table>') =>
 const settle = window => new Promise(resolve => window.requestAnimationFrame(() => window.requestAnimationFrame(resolve)));
 
 function page(path = '/owner/repo/pull/1/changes', body = '') {
-  const dom = new JSDOM(`<section><h2>Pull request toolbar</h2><button id="changes-selector-button">All commits</button></section>${body}`, {
+  const dom = new JSDOM(`<section><h2>Pull request toolbar</h2><div data-component="Stack" id="left-tools"><div><button id="changes-selector-button">All commits</button></div></div><div id="review-tools"><button>Submit review</button></div></section>${body}`, {
     url: `https://github.com${path}`, runScripts: 'outside-only', pretendToBeVisual: true,
   });
   const observers = [];
@@ -37,6 +37,9 @@ test('checkbox hides only generated cards and restores them without changing vie
     checkbox.dispatchEvent(new Event('change'));
     assert.equal(document.querySelectorAll('.githide-hidden').length, 0);
     assert.equal(document.querySelectorAll('#githide-control').length, 1);
+    assert.equal(document.querySelector('#githide-control').parentElement.id, 'left-tools');
+    assert.equal(document.querySelector('section').lastElementChild.id, 'review-tools');
+    assert.equal(document.querySelector('section').children.length, 3);
     assert.equal(document.querySelector('#diff-source table').textContent, 'source code');
   } finally { dom.window.close(); }
 });
@@ -63,6 +66,36 @@ test('late diffs, replaced toolbar, loaded diff, and navigation are handled', as
     window.history.pushState({}, '', '/owner/repo/pull/2/files');
     document.dispatchEvent(new Event('turbo:load'));
     assert.ok(document.querySelector('#githide-control'));
+    assert.equal(document.querySelectorAll('.githide-hidden').length, 0);
+  } finally { window.close(); }
+});
+
+test('sidebar hides generated leaves and empty folders, restores them, and handles new entries', async () => {
+  const leaf = id => `<li role="treeitem" id="tree-${id}"><a href="#diff-${id}">${id}</a></li>`;
+  const dom = page(undefined, file('generated', notice) + file('source') + `<nav id="pr-file-tree"><ul role="tree">
+    <li role="treeitem" id="mixed" aria-expanded="true"><ul role="group">${leaf('source')}
+      <li role="treeitem" id="generated-folder" aria-expanded="true"><ul role="group">${leaf('generated')}</ul></li>
+    </ul></li><li role="treeitem" id="collapsed" aria-expanded="false">Unloaded folder</li>
+    </ul></nav>`);
+  const {window} = dom;
+  const {document, Event} = window;
+  try {
+    const checkbox = document.querySelector('#githide-control input');
+    checkbox.click();
+    assert.ok(document.querySelector('#tree-generated.githide-hidden'));
+    assert.ok(document.querySelector('#generated-folder.githide-hidden'));
+    assert.equal(document.querySelector('#mixed').classList.contains('githide-hidden'), false);
+    assert.equal(document.querySelector('#collapsed').classList.contains('githide-hidden'), false);
+    assert.equal(document.querySelector('#tree-source').classList.contains('githide-hidden'), false);
+    document.querySelector('#pr-file-tree [role="tree"]').insertAdjacentHTML('beforeend', leaf('late'));
+    document.body.insertAdjacentHTML('beforeend', file('late', notice));
+    await settle(window);
+    assert.ok(document.querySelector('#tree-late.githide-hidden'));
+    checkbox.click();
+    assert.equal(document.querySelectorAll('.githide-hidden').length, 0);
+    checkbox.click();
+    window.history.pushState({}, '', '/owner/repo/pull/1');
+    document.dispatchEvent(new Event('turbo:load'));
     assert.equal(document.querySelectorAll('.githide-hidden').length, 0);
   } finally { window.close(); }
 });

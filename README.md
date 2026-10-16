@@ -14,18 +14,18 @@ GitHub's pull request **Files changed** tab (`/changes` and `/files`).
 
 No build or npm install is needed to use the extension.
 
-Chrome Web Store publication is being prepared. Until a store listing is live,
-use the unpacked installation above.
+Chrome Web Store publication is paused. Use the unpacked installation above.
 
 ## Behavior and privacy
 
 - Starts unchecked. The choice lasts until the page is reloaded.
 - Hides entire generated diff cards, including their headers, without marking
-  them as viewed. Unchecking restores them.
+  them as viewed. Also hides their entries in the left file tree and folders
+  whose loaded entries are all hidden. Unchecking restores them.
 - Uses GitHub's generated-file notice; does not guess from filenames.
 - Handles dynamically loaded diffs and navigation within GitHub. Once a file is
   recognized, it stays recognized in that view even after **Load Diff** is clicked.
-- Leaves the file tree and GitHub's review/file counts unchanged.
+- Leaves GitHub's review/file counts unchanged.
 - Runs only on `github.com`. The host-wide match lets it handle navigation into
   a PR without reloading. It makes no network requests, stores no data, and uses
   no background service or extra extension permissions.
