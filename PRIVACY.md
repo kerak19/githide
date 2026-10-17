@@ -10,7 +10,7 @@ events in GitHub pull requests using reversible display controls.
 GitHide reads the current GitHub page's URL and rendered diff markup locally
 to find GitHub's generated-file notices and show or hide the matching cards
 and file tree entries. It also reads rendered PR sidebar and timeline markup
-to hide selected sections and known metadata events.
+to hide selected sections and timeline event rows.
 File identifiers stay in the tab's memory until the page is reloaded or closed.
 GitHide stores only your display preferences (`hideGenerated`, `hideLabels`,
 `hideProjects`, `hideMilestone`, `hideDevelopment`, `hideNotifications`, and

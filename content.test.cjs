@@ -216,14 +216,15 @@ const conversationFixture = `<div data-component="PH_Actions"><button>Edit</butt
   </aside>
   <div class="TimelineItem" id="event-title"><span class="TimelineItem-badge"><svg class="octicon-pencil"></svg></span>Renamed</div>
   <div class="TimelineItem" id="event-push"><span class="TimelineItem-badge"><svg class="octicon-repo-push"></svg></span>Force pushed</div>
-  <div class="TimelineItem" id="event-review"><span class="TimelineItem-badge"><svg class="octicon-code-review"></svg></span>Approved</div>
+  <div class="js-socket-channel js-updatable-content" data-url="/owner/repo/pull/1/partials/deployed_event/123"><div class="TimelineItem js-targetable-element" id="event-deployment"><span class="TimelineItem-badge"></span>Deployed with GitHub Actions</div></div>
+  <div class="TimelineItem js-pull-review" id="pullrequestreview-123"><span class="TimelineItem-badge"><svg class="octicon-code-review"></svg></span>Approved</div>
   <div class="TimelineItem" id="event-closed"><span class="TimelineItem-badge"><svg class="octicon-issue-closed"></svg></span>Closed</div>
   <div class="TimelineItem" id="event-unknown">Unknown event</div>
-  <div class="TimelineItem" id="event-comment"><span class="TimelineItem-badge"><svg class="octicon-pencil"></svg></span><div class="timeline-comment">Comment</div></div>
+  <div class="TimelineItem" id="issuecomment-123"><div class="timeline-comment">Comment</div></div>
   <div class="TimelineItem" id="commit">Commit</div>
-  <div id="checks">Checks</div><button id="merge">Merge</button>`;
+  <div id="deployment-summary">15 active deployments</div><div id="checks">Checks</div><button id="merge">Merge</button>`;
 
-test('PR dropdown independently hides sidebar sections and known activity, preserving review content', async () => {
+test('PR dropdown hides all event containers regardless of type or icon, preserving review content', async () => {
   const data = {};
   const dom = await page('/owner/repo/pull/1', conversationFixture, createStorage(data));
   const {document} = dom.window;
@@ -246,9 +247,12 @@ test('PR dropdown independently hides sidebar sections and known activity, prese
     for (const key of ['hideProjects', 'hideMilestone', 'hideDevelopment', 'hideNotifications', 'hideActivity']) {
       menu.querySelector(`[name="${key}"]`).click();
     }
-    assert.equal(document.querySelectorAll('.githide-pr-hidden').length, 7);
+    assert.equal(document.querySelectorAll('.githide-pr-hidden').length, 10);
+    assert.ok(document.querySelector('#event-deployment.githide-pr-hidden'));
+    assert.ok(document.querySelector('#event-unknown.githide-pr-hidden'));
+    assert.ok(document.querySelector('#event-closed.githide-pr-hidden'));
     assert.deepEqual(Object.values(data), [true, true, true, true, true, true]);
-    for (const id of ['reviewers', 'event-review', 'event-closed', 'event-unknown', 'event-comment', 'commit', 'checks', 'merge']) {
+    for (const id of ['reviewers', 'pullrequestreview-123', 'issuecomment-123', 'commit', 'deployment-summary', 'checks', 'merge']) {
       assert.equal(document.getElementById(id).classList.contains('githide-pr-hidden'), false, id);
     }
     for (const input of menu.querySelectorAll('input')) input.click();
@@ -268,7 +272,7 @@ test('PR view settings persist, synchronize, handle late sections, and clear on 
     second.window.document.querySelector('[name="hideLabels"]').click();
     assert.equal(document.querySelector('[name="hideLabels"]').checked, false);
     assert.equal(document.querySelector('[data-channel-event-name="labels_updated"]').classList.contains('githide-pr-hidden'), false);
-    document.body.insertAdjacentHTML('beforeend', '<div class="TimelineItem" id="event-late"><span class="TimelineItem-badge"><svg class="octicon-person"></svg></span>Assigned</div>');
+    document.body.insertAdjacentHTML('beforeend', '<div data-url="/owner/repo/pull/1/partials/deployed_event/456"><div class="TimelineItem" id="event-late">Deployed</div></div>');
     await settle(window);
     assert.ok(document.querySelector('#event-late.githide-pr-hidden'));
     document.querySelector('#githide-pr-view').remove();

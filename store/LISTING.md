@@ -29,9 +29,11 @@ locally across reloads and PRs. A hidden-file count shows generated files detect
 so far; it can grow as GitHub loads more diffs.
 
 On the PR conversation page, open PR view beside the header actions to hide
-Labels, Projects, Milestone, Development, Notifications, or metadata activity events. These
+Labels, Projects, Milestone, Development, Notifications, or metadata activity events
+(all timeline event rows, including deployments and PR state changes). These
 choices save locally across PRs. Comments, reviews, commit lists, checks, merge
-controls, PR state changes, and unrecognized events stay visible.
+controls stay visible. Event filtering uses GitHub's event containers, without
+icon or event-type matching.
 
 Supports github.com pull request /changes and /files pages. GitHub Enterprise
 hosts and non-English generated-file notices are not supported. If a generated

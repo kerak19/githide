@@ -26,13 +26,12 @@ Open **PR view** beside the PR header actions. Choose which parts to hide:
 - Milestone
 - Development
 - Notifications
-- Activity events (title changes, assignments, labels, projects, milestones,
-  and force-push events)
+- Activity events (all timeline event rows, including deployments and PR state changes)
 
 All options start off, save locally across PRs, and update other open tabs.
 Uncheck an option to restore its content. The dropdown also closes with Escape
-or a click outside it. Comments, reviews, commit lists, checks, merge controls,
-and PR state changes stay visible. Unrecognized event types stay visible too.
+or a click outside it. Comments, reviews, commit lists, checks, and merge controls
+stay visible. The filter uses GitHub's event containers, without icon or event-type matching.
 
 ## Behavior and privacy
 

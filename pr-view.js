@@ -7,8 +7,6 @@
     ['hideNotifications', 'Notifications', '.sidebar-notifications'],
     ['hideActivity', 'Activity events', '.TimelineItem[id^="event-"]'],
   ];
-  const activityIcons = ['person', 'pencil', 'repo-push', 'tag', 'project', 'milestone']
-    .map(icon => `.TimelineItem-badge .octicon-${icon}`).join(', ');
   let settings = {};
   let scheduled = false;
 
@@ -29,11 +27,8 @@
 
     for (const [key, , selector] of options) {
       for (const node of document.querySelectorAll(selector)) {
-        // Only known metadata events are hidden; comments, reviews and state changes stay visible.
-        const isActivity = key !== 'hideActivity' ||
-          node.querySelector(activityIcons) && !node.querySelector('.timeline-comment, .review-comment, .review-thread, .js-pull-review');
         const target = key === 'hideActivity' ? node : node.closest('.discussion-sidebar-item');
-        target?.classList.toggle('githide-pr-hidden', settings[key] === true && Boolean(isActivity));
+        target?.classList.toggle('githide-pr-hidden', settings[key] === true);
       }
     }
 
@@ -74,7 +69,7 @@
         });
         label.append(checkbox, `Hide ${name.toLowerCase()}`);
         if (key === 'hideActivity') {
-          label.title = 'Hide title, assignment, label, project, milestone and force-push events. Comments, reviews, commits and state changes remain visible.';
+          label.title = 'Hide all timeline event rows, including deployments and state changes. Comments, review threads, commits and merge controls remain visible.';
         }
         panel.append(label);
       }
